@@ -1,4 +1,4 @@
-name: Build KuaiYan Projects
+name: Build KuaiYanGo2
 
 on:
   push:
@@ -11,67 +11,58 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # --------------------
-      # 检出后端仓库自身
-      # --------------------
-      - name: Checkout Backend Repo
-        uses: actions/checkout@v3
+    # 1. Checkout 后端仓库
+    - name: Checkout KuaiYanGo2
+      uses: actions/checkout@v4
+      with:
+        repository: wenfxl/KuaiYanGo2
+        path: KuaiYanGo2
 
-      # --------------------
-      # 检出前端仓库
-      # --------------------
-      - name: Checkout Frontend Repo
-        uses: actions/checkout@v3
-        with:
-          repository: wenfxl/KuaiYanWeb
-          path: KuaiYanWeb
+    # 2. Checkout 前端仓库
+    - name: Checkout KuaiYanWeb
+      uses: actions/checkout@v4
+      with:
+        repository: wenfxl/KuaiYanWeb
+        path: KuaiYanWeb
 
-      # --------------------
-      # 前端构建
-      # --------------------
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+    # 3. Setup Go
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.23
 
-      - name: Install Frontend Dependencies
-        working-directory: ./KuaiYanWeb
-        run: npm install
+    # 4. Build front-end assets (可选)
+    - name: Build KuaiYanWeb (Vue3)
+      working-directory: KuaiYanWeb
+      run: |
+        npm install
+        npm run build
+      env:
+        CI: true
 
-      - name: Build Frontend
-        working-directory: ./KuaiYanWeb
-        run: npm run build
+    # 5. Copy 前端打包资源到后端 assets 目录
+    - name: Copy assets to backend
+      run: |
+        mkdir -p KuaiYanGo2/core/dist/VueAdmin
+        mkdir -p KuaiYanGo2/core/dist/VueAgent
+        cp -r KuaiYanWeb/dist/VueAdmin/* KuaiYanGo2/core/dist/VueAdmin/
+        cp -r KuaiYanWeb/dist/VueAgent/* KuaiYanGo2/core/dist/VueAgent/
 
-      - name: Archive Frontend Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: ./KuaiYanWeb/dist
+    # 6. Set replace for local utils
+    - name: Ensure go.mod replace
+      run: |
+        cd KuaiYanGo2
+        go mod tidy
 
-      # --------------------
-      # 后端构建
-      # --------------------
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.23.8'
+    # 7. Build Go binary
+    - name: Build KuaiYanGo2
+      working-directory: KuaiYanGo2
+      run: |
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o KuaiYanGo2.bin main.go
 
-      # 如果需要替换本地模块 EFunc，可以这样写：
-      - name: Replace EFunc Module
-        working-directory: ./ 
-        run: go mod edit -replace EFunc=./
-
-      - name: Download Go Modules
-        working-directory: ./ 
-        run: go mod tidy
-
-      - name: Build Backend
-        working-directory: ./ 
-        run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o KuaiYanGo2.bin main.go
-
-      - name: Archive Backend Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-bin
-          path: ./KuaiYanGo2.bin
+    # 8. Upload artifact
+    - name: Upload binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: KuaiYanGo2-bin
+        path: KuaiYanGo2/KuaiYanGo2.bin
