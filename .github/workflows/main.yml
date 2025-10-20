@@ -36,7 +36,7 @@ jobs:
       working-directory: KuaiYanWeb
       run: |
         npm install
-        npm run build
+        npm run build --ignore-scripts
 
     # 5. Copy 前端打包结果到后端 assets 目录
     - name: Copy front-end build to backend
