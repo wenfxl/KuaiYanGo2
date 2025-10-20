@@ -36,17 +36,15 @@ jobs:
       run: |
         npm install
         node build.js
+        ls -R dist
 
-    - name: Debug front-end build
-      working-directory: KuaiYanWeb
-      run: ls -R dist
     # 5. Copy front-end build到后端 assets
     - name: Copy assets to backend
       run: |
         mkdir -p KuaiYanGo2/core/dist/VueAdmin
         mkdir -p KuaiYanGo2/core/dist/VueAgent
-        cp -r KuaiYanWeb/dist/VueAdmin/* KuaiYanGo2/core/dist/VueAdmin/ || true
-        cp -r KuaiYanWeb/dist/VueAgent/* KuaiYanGo2/core/dist/VueAgent/ || true
+        cp -r KuaiYanWeb/dist/VueAdmin/* KuaiYanGo2/core/dist/VueAdmin/
+        cp -r KuaiYanWeb/dist/VueAgent/* KuaiYanGo2/core/dist/VueAgent/
 
     # 6. Setup Go
     - name: Setup Go
