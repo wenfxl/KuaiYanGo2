@@ -43,7 +43,7 @@ jobs:
 
     # 打包产物
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: KuaiYanGo2-bin
         path: KuaiYanGo2.bin
