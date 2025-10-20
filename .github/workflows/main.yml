@@ -25,23 +25,27 @@ jobs:
         repository: wenfxl/KuaiYanWeb
         path: KuaiYanWeb
 
-    # 3. Setup Node.js (前端构建)
+    # 3. Setup Node.js
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: 20
 
+    # 4. Build KuaiYanWeb (Vue3)
     - name: Build KuaiYanWeb
       working-directory: KuaiYanWeb
       run: |
         npm install
         npm run build
 
-    # 复制前端打包结果到后端
-    - name: Copy assets to backend
+    # 5. Copy 前端打包结果到后端 assets 目录
+    - name: Copy front-end build to backend
       run: |
-        mkdir -p KuaiYanGo2/core/dist
-        cp -r KuaiYanWeb/dist/* KuaiYanGo2/core/dist/
+        mkdir -p KuaiYanGo2/core/dist/VueAdmin
+        mkdir -p KuaiYanGo2/core/dist/VueAgent
+        # 如果你前端打包默认输出 dist 下有 VueAdmin 和 VueAgent 文件夹
+        cp -r KuaiYanWeb/dist/VueAdmin/* KuaiYanGo2/core/dist/VueAdmin/
+        cp -r KuaiYanWeb/dist/VueAgent/* KuaiYanGo2/core/dist/VueAgent/
 
     # 6. Setup Go
     - name: Setup Go
@@ -49,7 +53,7 @@ jobs:
       with:
         go-version: 1.23
 
-    # 7. Tidy modules (确保 replace ./utils 生效)
+    # 7. Go mod tidy (确保 replace ./utils 生效)
     - name: Go mod tidy
       working-directory: KuaiYanGo2
       run: go mod tidy
@@ -60,7 +64,7 @@ jobs:
       run: |
         CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o KuaiYanGo2.bin main.go
 
-    # 9. Upload artifact
+    # 9. Upload Go binary
     - name: Upload binary
       uses: actions/upload-artifact@v4
       with:
