@@ -31,14 +31,11 @@ jobs:
       with:
         node-version: 20
 
-    # 4. Build front-end assets
     - name: Build KuaiYanWeb
       working-directory: KuaiYanWeb
       run: |
         npm install
-        npm run build
-      env:
-        CI: true
+        node build.js
 
     - name: Debug front-end build
       working-directory: KuaiYanWeb
