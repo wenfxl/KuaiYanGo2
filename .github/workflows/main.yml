@@ -35,8 +35,7 @@ jobs:
       working-directory: KuaiYanWeb
       run: |
         npm install
-        node build.js
-        ls -R dist
+        npm run build
 
     # 5. Copy front-end build到后端 assets
     - name: Copy assets to backend
