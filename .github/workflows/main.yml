@@ -1,0 +1,49 @@
+name: Build KuaiYan BIN
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: KuaiYanGo2  # 后端仓库路径，相对于根目录
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        submodules: true  # 如果前端是子模块
+
+    # 安装 Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    # 构建前端
+    - name: Build Frontend
+      working-directory: wenfxl/KuaiYanWeb  # 前端仓库路径
+      run: |
+        npm install
+        npm run build
+
+    # 安装 Go
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.23
+
+    # 编译 Go 后端
+    - name: Build Go Backend
+      run: |
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o KuaiYanGo2.bin main.go
+
+    # 打包产物
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: KuaiYanGo2-bin
+        path: KuaiYanGo2.bin
