@@ -41,11 +41,8 @@ jobs:
     # 5. Copy 前端打包结果到后端 assets 目录
     - name: Copy front-end build to backend
       run: |
-        mkdir -p KuaiYanGo2/core/dist/VueAdmin
-        mkdir -p KuaiYanGo2/core/dist/VueAgent
-        # 如果你前端打包默认输出 dist 下有 VueAdmin 和 VueAgent 文件夹
-        cp -r KuaiYanWeb/dist/VueAdmin/* KuaiYanGo2/core/dist/VueAdmin/
-        cp -r KuaiYanWeb/dist/VueAgent/* KuaiYanGo2/core/dist/VueAgent/
+        mkdir -p KuaiYanGo2/core/dist
+        cp -r KuaiYanWeb/dist/* KuaiYanGo2/core/dist/
 
     # 6. Setup Go
     - name: Setup Go
