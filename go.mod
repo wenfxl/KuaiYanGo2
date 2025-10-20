@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.8
 
 require EFunc v0.0.0
-replace EFunc => ./
+replace EFunc => ./utils
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dop251/goja v0.0.0-20230427124612-428fc442ff5f
